@@ -32,20 +32,22 @@
                 </div>
 
                 <div class="beta-comp">
-                    <div class="cart">
-                  <div class="beta-select"> 
-                            <a href=""><i class="fa fa-shopping-cart"></i> Giỏ hàng (Trống)</a>
-                        </div>
-                        <div class="beta-comp">
-                            @if(Session::has('cart'))
-                            <div class="cart">
-                                <div class="beta-select"><i class="fa fa-shopping-cart"></i> Giỏ hàng (@if(Session::has('cart')){{ Session('cart')->totalQty }} 
-                                    @else Trống @endif) <i class="fa fa-chevron-down"></i></div>
-                                
-                                    <div class="beta-dropdown cart-body">
-                                        @foreach($productCarts as $product)
+                     {{-- --------------------- --}}
+                 <div class="cart">
+                    <div class="beta-select"> 
+                        @if(!Session::has('cart') || Session::get('cart')->totalQty == 0)
+                            <a href="#"><i class="fa fa-shopping-cart"></i> Giỏ hàng (Trống)</a>
+                        @else
+                            <a href="#"><i class="fa fa-shopping-cart"></i> Giỏ hàng ({{ Session('cart')->totalQty }}) <i class="fa fa-chevron-down"></i></a>
+                        @endif
+                    </div>
+                    <div class="beta-comp">
+                        @if(Session::has('cart') && Session::get('cart')->totalQty > 0)
+                            <div class="beta-dropdown cart-body">
+                                @foreach($productCarts as $product)
+                                    <div class="cart-item">
                                         <div class="cart-item">
-                                            <a class="cart-item-delete" href=""><i class="fa fa-times"></i>
+                                            <a class="cart-item-delete" href="{{route('banhang.xoagiohang', $product['item']['id'])}}"><i class="fa fa-times"></i>
                                             </a>
                                             <div class="media">
                                                 <a class="pull-left" href="#"><img src="/source/image/product/{{ $product['item']['image'] }}" alt=""></a>
@@ -60,28 +62,26 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        @endforeach
-    
-                                        <div class="cart-caption">
-                                            <div class="cart-total text-right">Tổng tiền: <span class="cart-total-value">{{ $cart->totalPrice }}</span></div>
+                                    </div>
+                                @endforeach
+                                <div class="cart-caption">
+                                    <div class="cart-total text-right">Tổng tiền: <span class="cart-total-value">{{ $cart->totalPrice }}</span></div>
                                             <div class="clearfix"></div>
     
                                             <div class="center">
                                                 <div class="space10">&nbsp;</div>
-                                                <a href="" class="beta-btn primary text-center">Đặt hàng <i class="fa fa-chevron-right"></i></a>
+                                                <a href="{{route('banhang.getdathang')}}" class="beta-btn primary text-center">Đặt hàng <i class="fa fa-chevron-right"></i></a>
                                             </div>
-                                        </div>
-                                    </div>
-                            </div> <!-- .cart -->
-                            @endif
-                        </div>
-                    </div> <!-- .cart -->
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+                
 
 
 
-
-
-                    
+                    {{-- ------------------- --}}
                 </div>
             </div>
             <div class="clearfix"></div>

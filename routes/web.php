@@ -15,9 +15,9 @@ use App\Http\Controllers\UserController;
 |
 */
 
-// Route::get('/', function () {
-//     return view('homepage');
-// });
+Route::get('/shop', function () {
+    return view('shopping_cart');
+});
 
 // Route::resource('/shop',ProductController::class);
 
@@ -37,5 +37,12 @@ Route::get('/checkout',[ProductController::class,'checkout'])-> name('checkout')
 
 //để liên kết với nút hình Giỏ hàng để thêm sản phẩm vào giỏ hàng
 Route::get('/add-to-cart/{id}',[HomeController::class,'addToCart'])->name('banhang.addtocart');
+Route::get('/del-cart/{id}',[HomeController::class,'delCartItem'])->name('banhang.xoagiohang');
+Route::post('/update-cart', 'HomeController@updateCart')->name('update-cart');
+
+
+Route::get('/dathang',[HomeController::class,'getCheckout'])->name('banhang.getdathang');
+Route::post('/dathang',[HomeController::class,'postCheckout'])->name('banhang.postdathang');
+
 
 Route::get('/producttype/{id}',[HomeController::class,'getProductType'])-> name('getProductType');

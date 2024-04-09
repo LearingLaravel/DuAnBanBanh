@@ -17,7 +17,7 @@
 <div class="container">
 	<div id="content">
 
-		<form action="#" method="post" class="beta-form-checkout">
+		<form action="/dathang" method="post" class="beta-form-checkout">
 			<div class="row">
 				<div class="col-sm-6">
 					<h4>Đặt hàng</h4>
@@ -60,19 +60,26 @@
 						<div class="your-order-head">
 							<h5>Đơn hàng của bạn</h5>
 						</div>
+
+						@if(Session::has('cart') && Session::get('cart')->totalQty > 0)
 						<div class="your-order-body" style="padding: 0px 10px">
 							<div class="your-order-item">
 								<div>
+									@foreach($productCarts as $product)
 									<!--  one item	 -->
 									<div class="media">
-										<img width="25%" src="/source/assets/dest/images/shoping1.jpg" alt="" class="pull-left">
+										<img width="25%" src="/source/image/product/{{ $product['item']['image'] }}" alt="" class="pull-left">
 										<div class="media-body">
-											<p class="font-large">Men's Belt</p>
-											<span class="color-gray your-order-info">Color: Red</span>
-											<span class="color-gray your-order-info">Size: M</span>
-											<span class="color-gray your-order-info">Qty: 1</span>
+											<p class="font-large">{{ $product['item']['name'] }}</p>
+											<span class="font-medium ">Số lượng:{{ $product['qty'] }}</span> <br />
+											<span class="font-medium ">Price: @if($product['item']['promotion_price']==0)
+												{{ number_format($product['item']['unit_price']) }}@else 
+												{{ number_format($product['item']['promotion_price']) }}
+												@endif </span>
+											
 										</div>
 									</div>
+									@endforeach
 									<!-- end one item -->
 								</div>
 								<div class="clearfix"></div>
@@ -82,11 +89,12 @@
 									<p class="your-order-f18">Tổng tiền:</p>
 								</div>
 								<div class="pull-right">
-									<h5 class="color-black">$235.00</h5>
+									<h5 class="color-black">{{ number_format( $cart->totalPrice) }}</h5>
 								</div>
 								<div class="clearfix"></div>
 							</div>
 						</div>
+						@endif
 						<div class="your-order-head">
 							<h5>Hình thức thanh toán</h5>
 						</div>
@@ -115,7 +123,12 @@
 							</ul>
 						</div>
 
-						<div class="text-center"><a class="beta-btn primary" href="#">Đặt hàng <i class="fa fa-chevron-right"></i></a></div>
+						<div class="text-center">
+							<button type="submit">
+								<div class="beta-btn primary" href="{{route('banhang.postdathang')}}">Đặt hàng <i class="fa fa-chevron-right"></i></div>
+							</button>
+							
+						</div>
 					</div> <!-- .your-order -->
 				</div>
 			</div>
