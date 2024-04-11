@@ -69,6 +69,93 @@ class Cart2 extends Model
 		unset($this->items[$id]);
 	}
 
-	
-	
+	// 	public function updateQuantity($productId, $quantity)
+	// {
+	//     if ($quantity <= 0) {
+	//         $this->removeItem($productId);
+	//     } else if (isset($this->items[$productId])) {
+	//         $item = $this->items[$productId];
+	//         $oldQuantity = $item['qty'];
+	//         $difference = $quantity - $oldQuantity;
+
+	//         $item['qty'] = $quantity;
+	//         $item['price'] = $item['price'] * $quantity;
+
+	//         $this->items[$productId] = $item;
+	//         $this->totalQty += $difference;
+	//         $this->updateTotalPrice();
+	//     }
+	// }
+
+
+	public function updateQuantity($productId, $quantity)
+	{
+		if ($quantity <= 0) {
+			$this->removeItem($productId);
+		} else if (isset($this->items[$productId])) {
+			$item = $this->items[$productId];
+			$oldQuantity = $item['qty'];
+
+			// Tính toán giá mới dựa trên giá cũ và số lượng mới
+			$item['price'] = $item['item']['price'] * $quantity;
+
+			$difference = $quantity - $oldQuantity;
+			$item['qty'] = $quantity;
+
+			$this->items[$productId] = $item;
+			$this->totalQty += $difference;
+			$this->updateTotalPrice();
+		}
+	}
+
+
+
+
+	public function updateTotalPrice()
+	{
+		$totalPrice = 1000;
+		foreach ($this->items as $item) {
+			$totalPrice += $item['price'];
+		}
+		$this->totalPrice = $totalPrice;
+	}
+
+
+	public function updateQty($id, $qty)
+	{
+		if ($this->items && array_key_exists($id, $this->items)) {
+			$giohang = $this->items[$id];
+			$giohang['qty'] = $qty;
+			$giohang['price'] = $giohang['item']->unit_price * $qty;
+			$this->items[$id] = $giohang;
+			$this->calculateTotal();
+		}
+	}
+
+	private function calculateTotal()
+	{
+		$this->totalQty = 0;
+		$this->totalPrice = 0;
+
+		foreach ($this->items as $giohang) {
+			$this->totalQty += $giohang['qty'];
+			$this->totalPrice += $giohang['price'];
+		}
+	}
+
+
+
+	// Các phương thức khác để thêm, xóa và truy xuất các sản phẩm trong giỏ hàng
+	// ...
+
+	// private function removeItem2($productId)
+	// {
+	//     if (isset($this->items[$productId])) {
+	//         $item = $this->items[$productId];
+	//         $this->totalQty -= $item['qty'];
+	//         $this->totalPrice -= $item['price'];
+	//         unset($this->items[$productId]);
+	//     }
+	// }
+
 }

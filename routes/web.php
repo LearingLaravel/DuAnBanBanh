@@ -16,8 +16,12 @@ use App\Http\Controllers\UserController;
 */
 
 Route::get('/shop', function () {
+  
     return view('shopping_cart');
 });
+
+Route::get('/signup',[HomeController::class,'getSignUp'])->name('getsignup');
+Route::post('/signup',[HomeController::class,'postSignup'])->name('postsignup');
 
 // Route::resource('/shop',ProductController::class);
 
@@ -38,8 +42,10 @@ Route::get('/checkout',[ProductController::class,'checkout'])-> name('checkout')
 //để liên kết với nút hình Giỏ hàng để thêm sản phẩm vào giỏ hàng
 Route::get('/add-to-cart/{id}',[HomeController::class,'addToCart'])->name('banhang.addtocart');
 Route::get('/del-cart/{id}',[HomeController::class,'delCartItem'])->name('banhang.xoagiohang');
-Route::post('/update-cart', 'HomeController@updateCart')->name('update-cart');
-
+// routes/web.php
+// Route::post('update-to-cart', 'HomeController@updatetocart')->name('cart.update');
+Route::post('update-to-cart', [HomeController::class, 'updateToCart'])->name('update-to-cart');
+// Route::put('/cart/{id}', [HomeController::class, 'update2'])->name('cart.update');
 
 Route::get('/dathang',[HomeController::class,'getCheckout'])->name('banhang.getdathang');
 Route::post('/dathang',[HomeController::class,'postCheckout'])->name('banhang.postdathang');

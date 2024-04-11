@@ -35,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
                 $oldCart=Session::get('cart'); 
                 $cart=new Cart2();
                 $cart = $oldCart;
+               // dd($cart);
                 $view->with(['cart'=>Session::get('cart'),'productCarts'=>$cart->items,'totalPrice'=>$cart->totalPrice,'totalQty'=>$cart->totalQty]);
             }
         });

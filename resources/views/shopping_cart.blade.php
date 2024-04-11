@@ -1,5 +1,6 @@
 @extends('layouts.master');
 @section('banner')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <div class="inner-header">
     <div class="container">
         <div class="pull-left">
@@ -33,69 +34,75 @@
                     </tr>
                 </thead>
                 <tbody>
+                   
                     @foreach($productCarts as $product)
-                    <tr class="cart_item">
+                   
+                    <tr class="cart_item" data-product-id="{{ $product['item']['id'] }}">
                         <td class="product-name">
                             <div class="media">
                                 <img class="pull-left" src="assets/dest/images/shoping1.jpg" alt="">
                                 <div class="media-body">
                                     <p class="font-large">{{ $product['item']['name'] }}</p>
-                                  
-                                   
                                 </div>
                             </div>
                         </td>
-
                         <td class="product-price">
-                            <span class="amount"> @if($product['item']['promotion_price']==0)
-                                {{ number_format($product['item']['unit_price']) }}@else 
+                            <span class="amount">
+                                @if($product['item']['promotion_price']==0)
+                                {{ number_format($product['item']['unit_price']) }}
+                                @else 
                                 {{ number_format($product['item']['promotion_price']) }}
                                 @endif
                             </span>
                         </td>
-
-                        <td class="product-status">
-                            In Stock
-                        </td>
-
-                        <td class="product-quantity">
-                            <span class="font-medium ">{{ $product['qty'] }}</span> 
-                            <select name="product-qty" id="product-qty">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
+                        <td class="product-status">In Stock</td>
+                        {{-- <td class="product-quantity">
+                            <span class="font-medium">{{ $product['qty'] }}</span>
+                            <input type="number" name="product-qty" class="qty-input" value="{{ $product['qty'] }}" data-product-id="{{ $product['item']['id'] }}">
+                        </td> --}}
+                         
+                        <td class="cart-product-quantity" width="130px">
+                            <input type="hidden" class="product_id" value="{{ $product['item']['id'] }}">
+                            <div class="input-group quantity">
+                                <div class="input-group-prepend decrement-btn changeQuantity" style="cursor: pointer">
+                                    <span class="input-group-text">-</span>
+                                </div>
+                                <input type="text" class="qty-input form-control" maxlength="2" max="10" value="{{ $product['qty'] }}">
+                                <div class="input-group-append increment-btn changeQuantity" style="cursor: pointer">
+                                    <span class="input-group-text">+</span>
+                                </div>
+                            </div>
                         </td>
 
                         <td class="product-subtotal">
-                            <span class="amount">{{ number_format( $cart->totalPrice) }}</span>
+                            @if($product['item']['promotion_price']==0)
+                            {{ number_format($product['item']['unit_price'] * $product['qty']) }}
+                            @else 
+                            {{ number_format($product['item']['promotion_price'] * $product['qty']) }}
+                            @endif
                         </td>
                         <td class="product-remove">
-                            <a href="{{route('banhang.xoagiohang', $product['item']['id'])}}" class="remove" title="Remove this item"><i class="fa fa-trash-o"></i></a>
+                            <a href="{{ route('banhang.xoagiohang', $product['item']['id']) }}" class="remove" title="Remove this item"><i class="fa fa-trash-o"></i></a>
                         </td>
                     </tr>
-                   @endforeach
+                    @endforeach
                 </tbody>
-
                 <tfoot>
                     <tr>
                         <td colspan="6" class="actions">
-
                             <div class="coupon">
                                 <label for="coupon_code">Coupon</label> 
                                 <input type="text" name="coupon_code" value="" placeholder="Coupon code"> 
                                 <button type="submit" class="beta-btn primary" name="apply_coupon">Apply Coupon <i class="fa fa-chevron-right"></i></button>
                             </div>
-                            
-                            <button type="submit" class="beta-btn primary" name="update_cart">Update Cart <i class="fa fa-chevron-right"></i></button> 
+                            <button type="button" class="beta-btn primary update-cart-btn">Update Cart <i class="fa fa-chevron-right"></i></button> 
                             <button type="submit" class="beta-btn primary" name="proceed">Proceed to Checkout <i class="fa fa-chevron-right"></i></button>
                         </td>
                     </tr>
                 </tfoot>
             </table>
             @endif
+            
             <!-- End of Shop Table Products -->
         </div>
 
@@ -127,7 +134,7 @@
 
             <div class="cart-totals pull-right">
                 <div class="cart-totals-row"><h5 class="cart-total-title">Cart Totals</h5></div>
-                <div class="cart-totals-row"><span>Cart Subtotal:</span> <span>$188.00</span></div>
+                <div class="cart-totals-row"><span>Cart Subtotal:</span> <span></span></div>
                 <div class="cart-totals-row"><span>Shipping:</span> <span>Free Shipping</span></div>
                 <div class="cart-totals-row"><span>Order Total:</span> <span>$188.00</span></div>
             </div>
@@ -146,6 +153,7 @@
 <!-- include js files -->
 <script src="assets/dest/js/jquery.js"></script>
 <script src="assets/dest/vendors/jqueryui/jquery-ui-1.10.4.custom.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
 <script src="assets/dest/vendors/bxslider/jquery.bxslider.min.js"></script>
 <script src="assets/dest/vendors/colorbox/jquery.colorbox-min.js"></script>
@@ -170,34 +178,73 @@
     })
 </script>
 
-<script>
-    <script>
-    $(document).ready(function() {
-        $('select[name="product-qty"]').on('change', function() {
-            var productId = $(this).closest('.cart_item').data('product-id');
-            var newQty = $(this).val();
 
-            $.ajax({
-                url: '{{ route("update-cart") }}',
-                method: 'POST',
-                data: {
-                    productId: productId,
-                    newQty: newQty,
-                    _token: '{{ csrf_token() }}'
-                },
-                success: function(response) {
-                    // Update the total price and other information if needed
-                    console.log(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                }
-            });
+<script>
+    $(document).ready(function () {
+        $('.increment-btn').click(function (e) {
+            e.preventDefault();
+            var inputField = $(this).parents('.quantity').find('.qty-input');
+            var value = parseInt(inputField.val(), 10);
+            value = isNaN(value) ? 0 : value;
+            if (value < 10) {
+                value++;
+                inputField.val(value);
+            }
+        });
+
+        $('.decrement-btn').click(function (e) {
+            e.preventDefault();
+            var inputField = $(this).parents('.quantity').find('.qty-input');
+            var value = parseInt(inputField.val(), 10);
+            value = isNaN(value) ? 0 : value;
+            if (value > 1) {
+                value--;
+                inputField.val(value);
+            }
         });
     });
 </script>
 
+<script>
+$(document).ready(function () {
+    $('.changeQuantity').click(function (e) {
+        e.preventDefault();
+
+        var quantityInput = $(this).closest('.cart-product-quantity').find('.qty-input');
+        var quantity = parseInt(quantityInput.val());
+        var product_id = $(this).closest('.cart-product-quantity').find('.product_id').val();
+
+        if ($(this).hasClass('decrement-btn')) {
+            quantity = Math.max(quantity , 1);
+        } else if ($(this).hasClass('increment-btn')) {
+            quantity = Math.min(quantity , 10);
+        }
+
+        quantityInput.val(quantity);
+
+        var data = {
+            '_token': $('meta[name="csrf-token"]').attr('content'),
+            'qty': quantity,
+            'product_id': product_id,
+        };
+
+        $.ajax({
+            url: '{{ route("update-to-cart") }}',
+            type: 'POST',
+            data: data,
+            success: function (response) {
+                window.location.reload();
+                alertify.set('notifier', 'position', 'top-right');
+                alertify.success(response.status);
+            }
+        });
+    });
+});
 </script>
+
+
+
+
 </body>
 
 </html>
