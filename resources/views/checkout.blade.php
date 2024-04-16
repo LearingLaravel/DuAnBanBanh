@@ -3,7 +3,6 @@
 <div class="inner-header">
 	<div class="container">
 		<div class="pull-left">
-			<h6 class="inner-title">Đặt hàng</h6>
 		</div>
 		<div class="pull-right">
 			<div class="beta-breadcrumb">
@@ -18,41 +17,53 @@
 	<div id="content">
 
 		<form action="/dathang" method="post" class="beta-form-checkout">
+			@csrf
 			<div class="row">
 				<div class="col-sm-6">
 					<h4>Đặt hàng</h4>
+					@if(Session::has('success'))
+						<div class="alert alert-success">
+							{{ Session::get('success') }}
+						</div>
+					@endif
+					@if(Session::has('error'))
+						<div class="alert alert-danger">
+							{{ Session::get('error') }}
+						</div>
+					@endif
+
 					<div class="space20">&nbsp;</div>
 
 					<div class="form-block">
 						<label for="name">Họ tên*</label>
-						<input type="text" id="name" placeholder="Họ tên" required>
+						<input name="name" value="{{ old('name') }}" type="text" id="name" placeholder="Họ tên" required>
 					</div>
 					<div class="form-block">
 						<label>Giới tính </label>
-						<input id="gender" type="radio" class="input-radio" name="gender" value="nam" checked="checked" style="width: 10%"><span style="margin-right: 10%">Nam</span>
-						<input id="gender" type="radio" class="input-radio" name="gender" value="nữ" style="width: 10%"><span>Nữ</span>
+						<input value="{{ old('gender') }}" id="boy" type="radio" class="input-radio" name="gender" value="nam" checked="checked" style="width: 10%"><span style="margin-right: 10%">Nam</span>
+						<input value="{{ old('gender') }}" id="girl" type="radio" class="input-radio" name="gender" value="nữ" style="width: 10%"><span>Nữ</span>
 
 					</div>
 
 					<div class="form-block">
 						<label for="email">Email*</label>
-						<input type="email" id="email" required placeholder="expample@gmail.com">
+						<input value="{{ old('email') }}" name="email" type="email" id="email" required placeholder="expample@gmail.com">
 					</div>
 
 					<div class="form-block">
 						<label for="adress">Địa chỉ*</label>
-						<input type="text" id="adress" placeholder="Street Address" required>
+						<input value="{{ old('address') }}" name="address" type="text" id="adress" placeholder="Street Address" required>
 					</div>
 
 
 					<div class="form-block">
-						<label for="phone">Điện thoại*</label>
-						<input type="text" id="phone" required>
+						<label for="phone_number">Điện thoại*</label>
+						<input value="{{ old('phone_number') }}" name="phone_number" type="text" id="phone_number" required>
 					</div>
 
 					<div class="form-block">
 						<label for="notes">Ghi chú</label>
-						<textarea id="notes"></textarea>
+						<textarea value="{{ old('notes') }}" name="notes" id="notes"></textarea>
 					</div>
 				</div>
 				<div class="col-sm-6">
@@ -89,7 +100,16 @@
 									<p class="your-order-f18">Tổng tiền:</p>
 								</div>
 								<div class="pull-right">
-									<h5 class="color-black">{{ number_format( $cart->totalPrice) }}</h5>
+									<h5 class="color-black"><span class="cart-total-value">
+										<?php
+										$total = 0; // Biến đếm tổng tiền
+										foreach ($productCarts as $product) {
+											$subtotal = $product['qty'] * ($product['item']['promotion_price'] == 0 ? $product['item']['unit_price'] : $product['item']['promotion_price']);
+											$total += $subtotal;
+										}
+										echo number_format($total);
+										?>
+									</span></h5>
 								</div>
 								<div class="clearfix"></div>
 							</div>

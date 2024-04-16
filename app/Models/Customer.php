@@ -23,4 +23,8 @@ class Customer extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+    public function bills()
+    {
+        return $this->hasMany(Bill::class);
+    }
 }

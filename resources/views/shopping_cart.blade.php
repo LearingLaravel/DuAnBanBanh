@@ -40,8 +40,9 @@
                     <tr class="cart_item" data-product-id="{{ $product['item']['id'] }}">
                         <td class="product-name">
                             <div class="media">
-                                <img class="pull-left" src="assets/dest/images/shoping1.jpg" alt="">
+                                
                                 <div class="media-body">
+                                    <img class="pull-left" width="25%" src="/source/image/product/{{ $product['item']['image'] }}" alt="">
                                     <p class="font-large">{{ $product['item']['name'] }}</p>
                                 </div>
                             </div>
@@ -88,17 +89,7 @@
                     @endforeach
                 </tbody>
                 <tfoot>
-                    <tr>
-                        <td colspan="6" class="actions">
-                            <div class="coupon">
-                                <label for="coupon_code">Coupon</label> 
-                                <input type="text" name="coupon_code" value="" placeholder="Coupon code"> 
-                                <button type="submit" class="beta-btn primary" name="apply_coupon">Apply Coupon <i class="fa fa-chevron-right"></i></button>
-                            </div>
-                            <button type="button" class="beta-btn primary update-cart-btn">Update Cart <i class="fa fa-chevron-right"></i></button> 
-                            <button type="submit" class="beta-btn primary" name="proceed">Proceed to Checkout <i class="fa fa-chevron-right"></i></button>
-                        </td>
-                    </tr>
+                    
                 </tfoot>
             </table>
             @endif
@@ -134,9 +125,28 @@
 
             <div class="cart-totals pull-right">
                 <div class="cart-totals-row"><h5 class="cart-total-title">Cart Totals</h5></div>
-                <div class="cart-totals-row"><span>Cart Subtotal:</span> <span></span></div>
+                <div class="cart-totals-row"><span>Cart Subtotal:</span>  <span class="cart-total-value">
+                    <?php
+                    $total = 0; // Biến đếm tổng tiền
+                    foreach ($productCarts as $product) {
+                        $subtotal = $product['qty'] * ($product['item']['promotion_price'] == 0 ? $product['item']['unit_price'] : $product['item']['promotion_price']);
+                        $total += $subtotal;
+                    }
+                    echo number_format($total);
+                    ?>
+                </span></div>
                 <div class="cart-totals-row"><span>Shipping:</span> <span>Free Shipping</span></div>
-                <div class="cart-totals-row"><span>Order Total:</span> <span>$188.00</span></div>
+                <div class="cart-totals-row"><span>Order Total:</span> <span class="cart-total-value">
+                    <?php
+                    $total = 0; // Biến đếm tổng tiền
+                    foreach ($productCarts as $product) {
+                        $subtotal = $product['qty'] * ($product['item']['promotion_price'] == 0 ? $product['item']['unit_price'] : $product['item']['promotion_price']);
+                        $total += $subtotal;
+                    }
+                    echo number_format($total);
+                    ?>
+                </span></div>
+                <button type="submit" class="beta-btn primary" name="proceed"> <a href="{{route('banhang.getdathang')}}">Proceed to Checkout</a>  <i class="fa fa-chevron-right"></i></button>
             </div>
 
             <div class="clearfix"></div>

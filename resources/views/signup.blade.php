@@ -20,35 +20,57 @@
                         @endif
                         <div class="form-block">
                             <label for="email">Email address*</label>
-                            <input name="email" type="email" id="email" required>
+                            <input name="email" type="email" id="email" value="{{old('email')}}" required>
+                            @error('email')
+                            <span class="text-danger">{{$message}}</span>
+                          @enderror
                         </div>
 
                         <div class="form-block">
                             <label for="fullname">Fullname*</label>
-                            <input name="fullname" type="text" id="fullname" required>
+                            <input name="fullname" type="text" id="fullname"   value="{{old('fullname')}}"  required>
+                            @error('fullname')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
 
                         <div class="form-block">
                             <label for="adress">Address*</label>
-                            <input name="address" type="text" id="adress" value="Street Address" required>
+                            <input name="address" type="text" id="adress"   value="{{old('address')}}" required>
+                            @error('address')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
 
 
                         <div class="form-block">
                             <label for="phone">Phone*</label>
-                            <input name="phone" type="text" id="phone" required>
+                            <input name="phone" type="text" id="phone"  value="{{old('phone')}}" >
+                            @error('phone')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
+
                         </div>
                         <div class="form-block">
                             <label for="password">Password*</label>
-                            <input name="password" type="text" id="password" required>
+                            <input name="password" type="text" id="password"  value="{{old('password')}}" required>
+                            @error('password')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
                         <div class="form-block">
                             <label for="repassword">Re password*</label>
-                            <input  name="repassword" type="text" id="repassword" required>
+                            <input  name="repassword" type="text" id="repassword"  value="{{old('repassword')}}" required>
+                            @error('repassword')
+                            <span class="text-danger">{{$message}}</span>
+                            @enderror
                         </div>
                         <div class="form-block">
                             <button type="submit" class="btn btn-primary">Register</button>
+                            <a class="p-2" href="{{route('getlogin')}}">Đã có tài khoản? <span class="text-primary"> Login </span></a>
+                            
                         </div>
+                        
                     </div>
                     <div class="col-sm-3"></div>
                 </div>

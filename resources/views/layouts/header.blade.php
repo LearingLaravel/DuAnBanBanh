@@ -11,7 +11,7 @@
                 <ul class="top-details menu-beta l-inline">
                     <li><a href="#"><i class="fa fa-user"></i>Tài khoản</a></li>
                     <li><a href="{{route('getsignup')}}">Đăng kí</a></li>
-                    <li><a href="">Đăng nhập</a></li>
+                    <li><a href="{{route('getlogin')}}">Đăng nhập</a></li>
                 </ul>
             </div>
             <div class="clearfix"></div>
@@ -65,14 +65,29 @@
                                     </div>
                                 @endforeach
                                 <div class="cart-caption">
-                                    <div class="cart-total text-right">Tổng tiền: <span class="cart-total-value">{{ $cart->totalPrice }}</span></div>
-                                            <div class="clearfix"></div>
-    
-                                            <div class="center">
-                                                <div class="space10">&nbsp;</div>
-                                                <a href="{{route('banhang.getdathang')}}" class="beta-btn primary text-center">Đặt hàng <i class="fa fa-chevron-right"></i></a>
-                                            </div>
+                                    <div class="cart-total text-right">
+                                        Tổng tiền: <span class="cart-total-value">
+                                            <?php
+                                            $total = 0; // Biến đếm tổng tiền
+                                            foreach ($productCarts as $product) {
+                                                $subtotal = $product['qty'] * ($product['item']['promotion_price'] == 0 ? $product['item']['unit_price'] : $product['item']['promotion_price']);
+                                                $total += $subtotal;
+                                            }
+                                            echo number_format($total);
+                                            ?>
+                                        </span>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="cart-options">
+                                       
+                                        <div class="center">
+                                            <div class="space10"></div>
+                                            <a href="{{url('shop')}}" class="beta-btn primary " ><i class="fa fa-shopping-cart width-200"></i></a>
+                                            <a href="{{route('banhang.getdathang')}}" class="beta-btn primary">Đặt hàng <i class="fa fa-chevron-right"></i></a>
+                                        </div>
+                                    </div>
                                 </div>
+                                
                             </div>
                         @endif
                     </div>

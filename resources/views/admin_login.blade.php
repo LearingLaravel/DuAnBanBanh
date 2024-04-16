@@ -30,7 +30,6 @@
                             <label for="email">Email address*</label>
                             <input name ="email" type="email" id="email" required>
                         </div>
-
                         <div class="form-block">
                             <label for="password">Password*</label>
                             <input name="password" type="text" id="password" required>
@@ -38,7 +37,6 @@
                         <div class="form-block">
                             <button type="submit" class="btn btn-primary">Login</button>
                         </div>
-                        <a href={{route('forgotPassword')}}>Forgot password</a>
                     </div>
                     <div class="col-sm-3"></div>
                 </div>

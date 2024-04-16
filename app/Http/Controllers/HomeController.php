@@ -10,6 +10,11 @@ use App\Models\User;
 use App\Models\BillDetail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendMail;
 
 class HomeController extends Controller
 {   
@@ -18,33 +23,71 @@ class HomeController extends Controller
         return view('signup');
     } 
 
-    public function postSignup(Request $req){
-        $this->validate($req,
-        ['email'=>'required|email|unique:users,email',
-           'password'=>'required|min:6|max:20',
-           'fullname'=>'required',
-           'repassword'=>'required|same:password', 
-        ],
-        ['email.required'=>'Vui lòng nhập email',
-        'email.email'=>'Không đúng định dạng email',
-        'email.unique'=>'Email đã có người sử  dụng',
-        'password.required'=>'Vui lòng nhập mật khẩu',
-        'repassword.same'=>'Mật khẩu không giống nhau',
-        'password.min'=>'Mật khẩu ít nhất 6 ký tự'
-       ]);
-  
-       $user=new User();
-       $user->full_name=$req->fullname;
-       $user->email=$req->email;
-       $user->password=Hash::make($req->password);
-       $user->phone=$req->phone;
-       $user->address=$req->address;
-       $user->level=2;
-       $user->save();
-       return redirect()->back()->with('success','Tạo tài khoản thành công');
-     }
-     
+    public function postSignup(Request $req)
+{
+    $validator = Validator::make($req->all(), [
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:6|max:20',
+        'fullname' => 'required',
+        'repassword' => 'required|same:password', 
+    ], [
+        'email.required' => 'Vui lòng nhập email',
+        'email.email' => 'Không đúng định dạng email',
+        'email.unique' => 'Email đã có người sử dụng',
+        'password.required' => 'Vui lòng nhập mật khẩu',
+        'repassword.same' => 'Mật khẩu không giống nhau',
+        'password.min' => 'Mật khẩu ít nhất 6 ký tự'
+    ]);
+
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
+    }
+
+    $user = new User();
+    $user->full_name = $req->fullname;
+    $user->email = $req->email;
+    $user->password = Hash::make($req->password);
+    $user->phone = $req->phone;
+    $user->address = $req->address;
+    $user->level = 2;
+    $user->save();
     
+    return redirect()->route('getlogin')->with('success', 'Tạo tài khoản thành công. Vui lòng đăng nhập.');
+}
+
+     public function getLogin(){
+        return view('login');
+    }
+
+    public function postLogin(Request $req){
+        $this->validate($req,
+        [
+            'email'=>'required|email',
+            'password'=>'required|min:6|max:20'
+        ],
+        [
+            'email.required'=>'Vui lòng nhập email',
+            'email.email'=>'Không đúng định dạng email',
+            'email.unique'=>'Email đã có người sử  dụng',
+            'password.required'=>'Vui lòng nhập mật khẩu',
+            'password.min'=>'Mật khẩu ít nhất 6 ký tự'
+        ]
+        );
+        $credentials=['email'=>$req->email,'password'=>$req->password];
+        if(Auth::attempt($credentials)){//The attempt method will return true if authentication was successful. Otherwise, false will be returned.
+            return redirect('/')->with(['flag'=>'alert','message'=>'Đăng nhập thành công']);
+        }
+        else{
+            return redirect()->back()->with(['flag'=>'danger','message'=>'Đăng nhập không thành công']);
+        }
+    }
+
+    public function getLogout(Request $request){
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('/');
+    }
      
     public function getProductType($id)
     {
@@ -102,6 +145,9 @@ class HomeController extends Controller
 
     public function postCheckout(Request $request){
         $cart=Session::get('cart');
+        if (!$cart || $cart->isEmpty()) {
+            return redirect()->back()->with('error', 'Giỏ hàng của bạn đang trống. Vui lòng thêm sản phẩm trước khi đặt hàng.');
+        }
         $customer=new Customer();
         $customer->name=$request->input('name');
         $customer->gender=$request->input('gender');
@@ -192,6 +238,71 @@ public function updateToCart(Request $request)
     session()->put('cart', $cart);
     return response()->json(['status' => 'Cart updated successfully']);
 }
+
+
+
+
+
+public function getLoginAdmin(){
+    return view('admin_login');
+}
+
+public function postLoginAdmin(Request $req){
+    $this->validate($req,
+    [
+        'email'=>'required|email',
+        'password'=>'required|min:6|max:20'
+    ],
+    [
+        'email.required'=>'Vui lòng nhập email',
+        'email.email'=>'Không đúng định dạng email',
+        'email.unique'=>'Email đã có người sử  dụng',
+        'password.required'=>'Vui lòng nhập mật khẩu',
+        'password.min'=>'Mật khẩu ít nhất 6 ký tự'
+    ]
+    );
+    $credentials=array('email'=>$req->email,'password'=>$req->password);
+    if(Auth::attempt($credentials)){
+        return redirect('/admin/category/danhsach')->with(['flag'=>'alert','message'=>'Đăng nhập thành công']);
+    }
+    else{
+        return redirect()->back()->with(['flag'=>'danger','thongbao'=>'Đăng nhập không thành công']);
+    }
+}
+
+
+
+
+
+
+public function getInputEmail() {
+    return view('input-email');
+}
+public function postInputEmail(Request $req)
+    {
+        $email = $req->txtEmail;
+        //validate
+
+        // kiểm tra có user có email như vậy không
+        $user = User::where('email', $email)->get();
+        //dd($user);
+        if ($user->count() != 0) {
+            //gửi mật khẩu reset tới email
+            $randomPassword = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+            $sentData = [
+                'title' => 'Mật khẩu mới của bạn là:',
+                'body' => $randomPassword
+            ];
+
+            Mail::to('luan.tran25@student.passerellesnumeriques.org')->send(new \App\Mail\SendMail($sentData));
+
+            Session::flash('message', 'Send email successfully!');
+            return redirect()->route('getlogin');  //về lại trang đăng nhập của khách
+        } else {
+            return redirect()->route('forgotPassword')->with('message', 'Your email is not right');
+        }
+    } 
+
 
     
 }
