@@ -178,14 +178,21 @@ class HomeController extends Controller
         return redirect()->back()->with('success','Đặt hàng thành công');
     }
 
+    public function getHistory()
+    {
+        $data_history = BillDetail::select('products.name as product_name', 'products.image', 'bill_details.quantity', 'bill_details.unit_price', 'bills.date_order', 'bills.total', 'bills.payment', 'bills.note')
+        ->join('products', 'bill_details.id_product', '=', 'products.id')
+        ->join('bills', 'bill_details.id_bill', '=', 'bills.id')
+        ->get();
+        return view('history_order', compact('data_history'));
+    }
+
+
 
     public function updateCartItem(Request $request)
 {
     $productId = $request->input('product_id');
-    $quantity = $request->input('quantity');
-
-    // Xử lý cập nhật số lượng sản phẩm trong giỏ hàng ở đây
-    // Ví dụ: 
+    $quantity = $request->input('quantity'); 
     $product = Product::find($productId);
     $product->quantity = $quantity;
     $product->price = $quantity * $product->unit_price;
@@ -196,35 +203,7 @@ class HomeController extends Controller
 
 
 
-// public function updatetocart(Request $request)
-// {
-//     $prod_id = $request->input('product_id');
-//     $quantity = $request->input('quantity');
 
-//     if(Session::get('cart'))
-//     {
-//         $cookie_data = stripslashes(Session::get('cart'));
-//         $cart_data = json_decode($cookie_data, true);
-
-//         $item_id_list = array_column($cart_data, 'item_id');
-//         $prod_id_is_there = $prod_id;
-
-//         if(in_array($prod_id_is_there, $item_id_list))
-//         {
-//             foreach($cart_data as $keys => $values)
-//             {
-//                 if($cart_data[$keys]["item_id"] == $prod_id)
-//                 {
-//                     $cart_data[$keys]["item_quantity"] =  $quantity;
-//                     $item_data = json_encode($cart_data);
-//                     $minutes = 60;
-//                     Session::queue(Session::make('cart', $item_data, $minutes));
-//                     return response()->json(['status'=>'"'.$cart_data[$keys]["item_name"].'" Quantity Updated']);
-//                 }
-//             }
-//         }
-//     }
-// }
 
     
 public function updateToCart(Request $request)
@@ -238,9 +217,6 @@ public function updateToCart(Request $request)
     session()->put('cart', $cart);
     return response()->json(['status' => 'Cart updated successfully']);
 }
-
-
-
 
 
 public function getLoginAdmin(){
@@ -294,7 +270,7 @@ public function postInputEmail(Request $req)
                 'body' => $randomPassword
             ];
 
-            Mail::to('luan.tran25@student.passerellesnumeriques.org')->send(new \App\Mail\SendMail($sentData));
+            Mail::to('tinh.tran25@student.passerellesnumeriques.org')->send(new \App\Mail\SendMail($sentData));
 
             Session::flash('message', 'Send email successfully!');
             return redirect()->route('getlogin');  //về lại trang đăng nhập của khách

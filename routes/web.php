@@ -54,7 +54,7 @@ Route::post('update-to-cart', [HomeController::class, 'updateToCart'])->name('up
 
 Route::get('/dathang',[HomeController::class,'getCheckout'])->name('banhang.getdathang');
 Route::post('/dathang',[HomeController::class,'postCheckout'])->name('banhang.postdathang');
-
+Route::get('/history',[HomeController::class,'getHistory'])->name('banhang.gethistory');
 
 Route::get('/producttype/{id}',[HomeController::class,'getProductType'])-> name('getProductType');
 

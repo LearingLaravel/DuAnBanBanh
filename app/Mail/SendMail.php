@@ -33,9 +33,9 @@ class SendMail extends Mailable
     public function build()
     {
         // Truyền dữ liệu vào view
-        return $this->from('luan.tran25@student.passerellesnumeriques.org', 'From Luan')
+        return $this->from('tinh.tran25@student.passerellesnumeriques.org', 'From tinh')
             ->subject('yêu cầu cấp lại mật khẩu từ shop bánh')
-            ->replyTo('luan.tran25@student.passerellesnumeriques.org', 'Âm')
+            ->replyTo('tinh.tran25@student.passerellesnumeriques.org', 'ÂmIuOi')
             ->view('interfaceEmail', ['sentData' => $this->sentData]);
     }
 
